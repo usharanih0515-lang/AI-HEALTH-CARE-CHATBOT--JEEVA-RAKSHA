@@ -24,10 +24,10 @@ const logger                = require('../utils/logger');
 const getMyProfile = async (req, res) => {
   try {
     const [rows] = await executeQuery(
-      `SELECT id, firebase_uid, full_name, email, phone, date_of_birth,
-              gender, language, profile_photo, role, is_active, created_at, updated_at
-       FROM users WHERE id = ? LIMIT 1`,
-      [req.user.id],
+      `SELECT user_id, firebase_uid, full_name, email, phone, date_of_birth,
+              gender, language, profile_photo, role, status, created_at, updated_at
+       FROM users WHERE user_id = ? LIMIT 1`,
+      [req.user.user_id],
     );
 
     if (rows.length === 0) {
@@ -68,13 +68,13 @@ const updateMyProfile = async (req, res) => {
       return sendError(res, 400, 'No valid fields to update.');
     }
 
-    values.push(req.user.id);
+    values.push(req.user.user_id);
     await executeQuery(
-      `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+      `UPDATE users SET ${updates.join(', ')} WHERE user_id = ?`,
       values,
     );
 
-    logger.info(`[User] Profile updated for user ID: ${req.user.id}`);
+    logger.info(`[User] Profile updated for user ID: ${req.user.user_id}`);
     return sendSuccess(res, 200, 'Profile updated successfully.');
   } catch (error) {
     logger.error('[User] updateMyProfile error:', error);
@@ -84,14 +84,14 @@ const updateMyProfile = async (req, res) => {
 
 /**
  * deleteMyAccount — Soft-delete the authenticated user's account.
- * Sets is_active = 0 rather than removing the row to preserve data integrity.
+ * Sets status = 'inactive' rather than removing the row to preserve data integrity.
  *
  * @type {import('express').RequestHandler}
  */
 const deleteMyAccount = async (req, res) => {
   try {
-    await executeQuery('UPDATE users SET is_active = 0 WHERE id = ?', [req.user.id]);
-    logger.info(`[User] Account deactivated for user ID: ${req.user.id}`);
+    await executeQuery("UPDATE users SET status = 'inactive' WHERE user_id = ?", [req.user.user_id]);
+    logger.info(`[User] Account deactivated for user ID: ${req.user.user_id}`);
     return sendSuccess(res, 200, 'Account deactivated successfully.');
   } catch (error) {
     logger.error('[User] deleteMyAccount error:', error);
@@ -130,7 +130,7 @@ const listUsers = async (req, res) => {
 
     // Fetch the page
     const [rows] = await executeQuery(
-      `SELECT id, full_name, email, phone, role, language, is_active, created_at
+      `SELECT user_id, full_name, email, phone, role, language, status, created_at
        FROM users ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
       [...params, limit, offset],
     );
@@ -156,7 +156,7 @@ const getUserById = async (req, res) => {
     }
 
     const [rows] = await executeQuery(
-      'SELECT id, firebase_uid, full_name, email, phone, role, language, is_active, created_at FROM users WHERE id = ?',
+      'SELECT user_id, firebase_uid, full_name, email, phone, role, language, status, created_at FROM users WHERE user_id = ?',
       [id],
     );
 

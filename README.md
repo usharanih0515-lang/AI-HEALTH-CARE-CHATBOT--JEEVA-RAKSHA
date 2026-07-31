@@ -14,7 +14,7 @@
 | **Database**       | MySQL                                |
 | **Authentication** | Firebase Authentication              |
 | **ML Service**     | Python 3.11 + FastAPI + Scikit-learn |
-| **Dev Tool**       | Visual Studio Code                   |
+| **Dev Tool**       | Antigravity                  |
 
 ---
 

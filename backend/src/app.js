@@ -44,6 +44,15 @@ const app = express();
 app.use(helmet());
 
 /**
+ * HTTP request logger using Morgan.
+ * Placed early to log all requests, including those blocked by rate limiting.
+ */
+const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
+app.use(morgan(morganFormat, {
+  stream: { write: (message) => logger.http(message.trim()) },
+}));
+
+/**
  * CORS — Cross-Origin Resource Sharing configuration.
  * Controls which origins are allowed to access this API.
  */
@@ -92,18 +101,22 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 /** Compress response bodies for improved performance */
 app.use(compression());
 
-/**
- * HTTP request logger using Morgan.
- * In production, logs a concise format; in development, uses colorised 'dev'.
- */
-const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
-app.use(morgan(morganFormat, {
-  stream: { write: (message) => logger.http(message.trim()) },
-}));
-
 // ─────────────────────────────────────────────────────────────────────────────
 // API Routes
 // ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Root endpoint — Welcome to the API.
+ */
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Welcome to Jeeva Raksha API',
+    version: '1.0.0',
+    healthCheck: '/health',
+    apiBase: '/api/v1'
+  });
+});
 
 /**
  * Health check route — publicly accessible, no auth required.

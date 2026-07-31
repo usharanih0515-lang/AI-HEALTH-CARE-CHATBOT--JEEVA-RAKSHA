@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255),
     profile_photo VARCHAR(1024),
     language      VARCHAR(10) DEFAULT 'en',
+    date_of_birth DATE,
+    gender        ENUM('male', 'female', 'other', 'prefer_not_to_say'),
     status        ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
     email_verified BOOLEAN DEFAULT FALSE,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

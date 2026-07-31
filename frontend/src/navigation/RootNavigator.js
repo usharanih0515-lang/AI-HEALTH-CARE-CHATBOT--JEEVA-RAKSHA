@@ -15,6 +15,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AuthNavigator from './AuthNavigator';
 import AppNavigator from './AppNavigator';
+import PatientDashboardScreen from '../screens/app/PatientDashboardScreen';
+import DoctorDashboardScreen from '../screens/app/DoctorDashboardScreen';
+import AdminDashboardScreen from '../screens/app/AdminDashboardScreen';
 import { FullScreenLoader } from '../components/common/Loader';
 import { STORAGE_KEYS } from '../utils/constants';
 
@@ -63,9 +66,13 @@ const RootNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user && role ? (
-        // For Module 01, we route all authenticated users to the generic AppNavigator placeholder.
-        // In future modules, this will branch to PatientNavigator, DoctorNavigator, AdminNavigator.
-        <Stack.Screen name="AppCore" component={AppNavigator} />
+        role === 'patient' ? (
+          <Stack.Screen name="PatientDashboard" component={PatientDashboardScreen} />
+        ) : role === 'doctor' ? (
+          <Stack.Screen name="DoctorDashboard" component={DoctorDashboardScreen} />
+        ) : (
+          <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
+        )
       ) : (
         <Stack.Screen name="AuthFlow" component={AuthNavigator} />
       )}

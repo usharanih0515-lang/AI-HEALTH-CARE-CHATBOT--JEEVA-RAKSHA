@@ -37,13 +37,13 @@ const createAndStoreOtp = async (userId) => {
   const expiry = new Date(Date.now() + 10 * 60000);
 
   // Invalidate any existing unverified OTPs for this user
-  await db.query(
+  await db.pool.query(
     'UPDATE otp_verifications SET verified = 1 WHERE user_id = ? AND verified = 0',
     [userId]
   );
 
   // Store new OTP
-  await db.query(
+  await db.pool.query(
     'INSERT INTO otp_verifications (user_id, otp, expiry) VALUES (?, ?, ?)',
     [userId, hashedOtp, expiry]
   );
@@ -59,7 +59,7 @@ const createAndStoreOtp = async (userId) => {
  * @returns {boolean} - True if valid, false otherwise
  */
 const verifyOtp = async (userId, submittedOtp) => {
-  const [rows] = await db.query(
+  const [rows] = await db.pool.query(
     'SELECT * FROM otp_verifications WHERE user_id = ? AND verified = 0 AND expiry > NOW() ORDER BY created_at DESC LIMIT 1',
     [userId]
   );
@@ -73,7 +73,7 @@ const verifyOtp = async (userId, submittedOtp) => {
 
   if (isValid) {
     // Mark as verified so it can't be used again
-    await db.query('UPDATE otp_verifications SET verified = 1 WHERE otp_id = ?', [record.otp_id]);
+    await db.pool.query('UPDATE otp_verifications SET verified = 1 WHERE otp_id = ?', [record.otp_id]);
     return true;
   }
 

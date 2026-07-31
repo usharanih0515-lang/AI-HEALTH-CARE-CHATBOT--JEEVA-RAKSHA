@@ -50,16 +50,33 @@ const sendEmail = async (to, subject, html) => {
  * @param {string} otp - The OTP string
  */
 const sendOtpEmail = async (to, otp) => {
-  const html = `
-    <div style="font-family: Arial, sans-serif; padding: 20px;">
-      <h2>Jeeva Raksha Verification</h2>
-      <p>Your One Time Password (OTP) is:</p>
-      <h1 style="color: #4A90D9; letter-spacing: 5px;">${otp}</h1>
-      <p>This code will expire in 10 minutes.</p>
-      <p>If you did not request this, please ignore this email.</p>
-    </div>
-  `;
-  return sendEmail(to, 'Your Jeeva Raksha Verification Code', html);
+  if (process.env.NODE_ENV !== 'production') {
+    logger.info(`[EmailService] 📧 (MOCK) Sent OTP ${otp} to ${to}`);
+    return;
+  }
+
+  const mailOptions = {
+    from: `"Jeeva Raksha" <${process.env.SMTP_USER}>`,
+    to,
+    subject: 'Jeeva Raksha - Your OTP Verification Code',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+        <h2>Welcome to Jeeva Raksha</h2>
+        <p>Your OTP verification code is:</p>
+        <h1 style="color: #4A90E2; letter-spacing: 2px;">${otp}</h1>
+        <p>This code is valid for 10 minutes.</p>
+        <p>If you did not request this, please ignore this email.</p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    logger.info(`[EmailService] OTP sent successfully to ${to}`);
+  } catch (error) {
+    logger.error(`[EmailService] Failed to send OTP to ${to}: ${error.message}`);
+    throw new Error('Could not send OTP email');
+  }
 };
 
 module.exports = {

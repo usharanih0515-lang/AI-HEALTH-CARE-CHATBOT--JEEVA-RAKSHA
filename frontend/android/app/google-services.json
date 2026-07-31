@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "546755062984",
+    "project_id": "jeeva-raksha-health-care-app",
+    "storage_bucket": "jeeva-raksha-health-care-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:546755062984:android:8a55f6ab189929e78a89fd",
+        "android_client_info": {
+          "package_name": "com.usharani.jeevaraksha"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcug_2ljx6MW9H3KxEQkC3j4NjrfArNr0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

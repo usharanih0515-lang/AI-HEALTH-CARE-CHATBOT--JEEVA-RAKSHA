@@ -24,7 +24,7 @@ const authenticate = async (req, res, next) => {
   }
 
   if (!token) {
-    return sendError(res, 'Not authorized, no token provided', 401);
+    return sendError(res, 401, 'Not authorized, no token provided');
   }
 
   try {
@@ -52,18 +52,18 @@ const authenticate = async (req, res, next) => {
     const [users] = await pool.query('SELECT user_id, firebase_uid, role, full_name, email, status FROM users WHERE user_id = ?', [userId]);
     
     if (users.length === 0) {
-      return sendError(res, 'User no longer exists', 401);
+      return sendError(res, 401, 'User no longer exists');
     }
 
     if (users[0].status === 'suspended') {
-      return sendError(res, 'Account suspended. Contact admin.', 403);
+      return sendError(res, 403, 'Account suspended. Contact admin.');
     }
 
     req.user = users[0];
     next();
   } catch (error) {
     logger.error(`[Auth Middleware] Token failed: ${error.message}`);
-    return sendError(res, 'Not authorized, invalid token', 401);
+    return sendError(res, 401, 'Not authorized, invalid token');
   }
 };
 
@@ -74,10 +74,10 @@ const authenticate = async (req, res, next) => {
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return sendError(res, 'Not authenticated', 401);
+      return sendError(res, 401, 'Not authenticated');
     }
     if (!roles.includes(req.user.role)) {
-      return sendError(res, `Role (${req.user.role}) is not allowed to access this resource.`, 403);
+      return sendError(res, 403, `Role (${req.user.role}) is not allowed to access this resource.`);
     }
     next();
   };

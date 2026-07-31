@@ -11,6 +11,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
+const userController = require('../controllers/user.controller');
 const { authenticate } = require('../middleware/authenticate');
 const { sendError } = require('../utils/apiResponse');
 
@@ -18,7 +19,7 @@ const { sendError } = require('../utils/apiResponse');
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return sendError(res, errors.array()[0].msg, 400);
+    return sendError(res, 400, errors.array()[0].msg);
   }
   next();
 };
@@ -53,9 +54,9 @@ router.use(authenticate);
 
 router.post('/logout', authController.logout);
 router.get('/session', authController.getSession);
-router.get('/profile', authController.getProfile);
-router.put('/profile', authController.updateProfile);
+router.get('/profile', userController.getMyProfile);
+router.put('/profile', userController.updateMyProfile);
 router.put('/change-password', authController.resetPassword); // Assuming internal reset utilizes similar logic
-router.delete('/account', authController.deleteAccount);
+router.delete('/account', userController.deleteMyAccount);
 
 module.exports = router;
